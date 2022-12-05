@@ -1,0 +1,39 @@
+from collections import deque
+
+import aoc
+
+input = aoc.get_input(5, False)
+
+example = """    [D]
+[N] [C]
+[Z] [M] [P]
+ 1   2   3
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2"""
+
+
+def part1(game: str) -> str:
+    stack_str, inst_str = game.split("\n\n")
+    stacks = []
+    for row in stack_str.splitlines()[:-1]:
+        for index in range(1, len(row), 4):
+            column = index // 4
+            value = row[index]
+            if len(stacks) < column + 1:
+                stacks.append(deque())
+            if value.strip():
+                stacks[column].append(value)
+
+    for inst in inst_str.splitlines():
+        _, count, _, origin, _, dest = inst.strip().split(" ")
+        for _ in range(0, int(count)):
+            stacks[int(dest) - 1].appendleft(stacks[int(origin) - 1].popleft())
+
+    return "".join(stack[0] for stack in stacks)
+
+
+assert part1(example) == "CMZ"
+print(part1(input))
