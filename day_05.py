@@ -19,9 +19,7 @@ def stack_game(game: str, deque_append_func) -> str:
     stack_str, inst_str = game.split("\n\n")
     stacks = []
     for row in stack_str.splitlines()[:-1]:
-        for index in range(1, len(row), 4):
-            column = index // 4
-            value = row[index]
+        for column, value in enumerate(row[1::4]):
             if len(stacks) < column + 1:
                 stacks.append(deque())
             if value.strip():
