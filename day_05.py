@@ -15,7 +15,7 @@ move 2 from 2 to 1
 move 1 from 1 to 2"""
 
 
-def part1(game: str) -> str:
+def stack_game(game: str, deque_append_func) -> str:
     stack_str, inst_str = game.split("\n\n")
     stacks = []
     for row in stack_str.splitlines()[:-1]:
@@ -29,11 +29,26 @@ def part1(game: str) -> str:
 
     for inst in inst_str.splitlines():
         _, count, _, origin, _, dest = inst.strip().split(" ")
+        stage = deque()
         for _ in range(0, int(count)):
-            stacks[int(dest) - 1].appendleft(stacks[int(origin) - 1].popleft())
+            value = stacks[int(origin) - 1].popleft()
+            deque_append_func(stage, value)
+        stacks[int(dest) - 1].extendleft(stage)
 
     return "".join(stack[0] for stack in stacks)
 
 
+def part1(game: str) -> str:
+    return stack_game(game, deque.append)
+
+
+def part2(game: str) -> str:
+    return stack_game(game, deque.appendleft)
+
+
 assert part1(example) == "CMZ"
 print(part1(input))
+
+
+assert part2(example) == "MCD"
+print(part2(input))
