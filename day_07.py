@@ -8,7 +8,7 @@ input = aoc.get_input(7)
 class Dir(NamedTuple):
     name: str
     parent_dir: "Dir"
-    files: List[Tuple[int, str]]
+    files: List[int]
     dirs: List["Dir"]
 
 
@@ -40,6 +40,7 @@ $ ls
 def get_size_totals(console: List[str]) -> Dict[str, int]:
     root_dir = Dir("/", None, [], [])
     current_dir = root_dir
+    # skip root dir
     for line in console[1:]:
         parts = line.split(" ")
         if parts[0] == "$":
@@ -54,18 +55,10 @@ def get_size_totals(console: List[str]) -> Dict[str, int]:
             if parts[0] == "dir":
                 current_dir.dirs.append(Dir(parts[1].strip(), current_dir, [], []))
             else:
-                current_dir.files.append(
-                    (
-                        int(parts[0]),
-                        parts[1],
-                    )
-                )
+                current_dir.files.append(int(parts[0]))
 
     def calc_size(dir: Dir, totals):
-        file_sum = sum(f[0] for f in dir.files)
-        dir_total = file_sum
-        for d in dir.dirs:
-            dir_total += calc_size(d, totals)
+        dir_total = sum(dir.files) + sum(calc_size(d, totals) for d in dir.dirs)
         totals[dir.name] = dir_total
         return dir_total
 
@@ -85,22 +78,10 @@ print(part1(input))
 
 def part2(console: List[str]) -> int:
     totals = get_size_totals(console)
-    total_space = 70000000
-    free_space_target = 30000000
     space_used = totals["/"]
-    current_free_space = total_space - space_used
-    space_needed = free_space_target - current_free_space
-    winner = (
-        "",
-        999999999999,
-    )
-    for d, d_space in totals.items():
-        if d_space >= space_needed and d_space <= winner[1]:
-            winner = (
-                d,
-                d_space,
-            )
-    return winner[1]
+    current_free_space = 70000000 - space_used
+    space_needed = 30000000 - current_free_space
+    return min(space for space in totals.values() if space >= space_needed)
 
 
 assert part2(example) == 24933642
