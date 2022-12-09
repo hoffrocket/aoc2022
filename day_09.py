@@ -80,21 +80,18 @@ def part2(rows: List[str], t_count: int = 9) -> int:
                 t_x, t_y = pos_map[knot]
                 dt_x = rh_x - t_x
                 dt_y = rh_y - t_y
-                if abs(dt_x) == 2:
-                    t_x += dt_x//2
-                    t_y += dt_y
-                    # if knot == t_count:
-                    #     print("new t pos", t_x, t_y, "rh_pos", rh_x, rh_y, "h_pos", h_x, h_y)
-                elif abs(dt_y) == 2:
-                    t_y += dt_y//2
-                    t_x += dt_x
-                    # if knot == t_count:
-                    #     print("new t pos", t_x, t_y, "rh_pos", rh_x, rh_y, "h_pos", h_x, h_y)
+                if abs(dt_x) > 1:
+                    t_x += dt_x//abs(dt_x)
+                    if dt_y != 0:
+                        t_y += dt_y//abs(dt_y)
+                elif abs(dt_y) > 1:
+                    t_y += dt_y//abs(dt_y)
+                    if dt_x != 0:
+                        t_x += dt_x//abs(dt_x)
                 if knot == t_count:
                     t_positions.add((t_x, t_y, ))
                 pos_map[knot] = (t_x, t_y,)
                 rh_x, rh_y = t_x, t_y
-
 
     # print(t_positions)
     return len(t_positions)
