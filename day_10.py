@@ -174,3 +174,37 @@ def part1(rows: List[str]) -> int:
 
 assert part1(example) == 13140, part1(example)
 print(part1(input))
+
+
+def part2(rows: List[str]) -> str:
+    pixels = [list(x) for x in ([list("." * 40)] * 6)]
+    row_index = 0
+    clock = 0
+    x = 1
+    for row in rows:
+        parts = row.strip().split(" ")
+        op = parts[0]
+        inc = 1 if op == "noop" else 2
+        for _ in range(0, inc):
+            if clock in [x - 1, x, x + 1]:
+                pixels[row_index][clock] = "#"
+            clock += 1
+            if clock == 40:
+                clock = 0
+                row_index += 1
+        if op == "addx":
+            x += int(parts[1])
+
+    return "\n".join("".join(row) for row in pixels)
+
+
+assert (
+    part2(example)
+    == """##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######....."""
+), part2(example)
+print(part2(input))
