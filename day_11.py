@@ -43,7 +43,6 @@ class Monkey:
         self.test: int = 0
         self.true_action: str = None
         self.false_action: str = None
-        self.start_items: List[int] = None
         self.items: List[int] = None
 
     def operate(self, old: int):
