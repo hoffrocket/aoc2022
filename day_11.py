@@ -75,7 +75,6 @@ def solution(rows: List[str], worry_discount: int, num_rounds: int) -> int:
             elif tokens[1] == "false:":
                 current_monkey.false_action = int(tokens[5])
     # print("Start", monkeys)
-    monkey_dict = {m.id: m for m in monkeys}
 
     inspection_counts = [0] * len(monkeys)
     test_product = functools.reduce(operator.mul, [m.test for m in monkeys])
@@ -84,13 +83,12 @@ def solution(rows: List[str], worry_discount: int, num_rounds: int) -> int:
             for item in monkey.items:
                 inspection_counts[monkey.id] += 1
                 new_item = monkey.operate(item) // worry_discount
-                next_monkey = monkey_dict[monkey.true_action if new_item % monkey.test == 0 else monkey.false_action]
+                next_monkey = monkeys[monkey.true_action if new_item % monkey.test == 0 else monkey.false_action]
                 if worry_discount == 1:
                     next_monkey.items.append(new_item % test_product)
                 else:
                     next_monkey.items.append(new_item)
             monkey.items = []
-            # print(f"Round {round}", monkeys)
         # print(f"Round {round}", monkeys)
     # print("inspection_counts", inspection_counts)
     return functools.reduce(operator.mul, sorted(inspection_counts, reverse=True)[:2])
@@ -108,5 +106,5 @@ def part2(rows: List[str]) -> int:
     return solution(rows, 1, 10000)
 
 
-# assert part2(example) == 2713310158 # , part2(example)
+assert part2(example) == 2713310158
 print(part2(input))
