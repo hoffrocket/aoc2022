@@ -43,6 +43,7 @@ class Monkey:
         self.test: int = 0
         self.true_action: str = None
         self.false_action: str = None
+        self.start_items: List[int] = None
         self.items: List[int] = None
 
     def operate(self, old: int):
@@ -53,7 +54,7 @@ class Monkey:
         return f"Monkey[{self.id},{self.items}, {self.test},{self.true_action},{self.false_action},{self.operation},{self.operand}]"
 
 
-def part1(rows: List[str]) -> int:
+def solution(rows: List[str], worry_discount: int, num_rounds: int) -> int:
     current_monkey = None
     monkeys = []
     for row in rows:
@@ -75,20 +76,37 @@ def part1(rows: List[str]) -> int:
                 current_monkey.false_action = int(tokens[5])
     # print("Start", monkeys)
     monkey_dict = {m.id: m for m in monkeys}
+
     inspection_counts = [0] * len(monkeys)
-    for round in range(1, 21):
+    test_product = functools.reduce(operator.mul, [m.test for m in monkeys])
+    for round in range(1, num_rounds + 1):
         for monkey in monkeys:
             for item in monkey.items:
                 inspection_counts[monkey.id] += 1
-                new_item = monkey.operate(item) // 3
-                monkey_dict[monkey.true_action if new_item % monkey.test == 0 else monkey.false_action].items.append(
-                    new_item
-                )
+                new_item = monkey.operate(item) // worry_discount
+                next_monkey = monkey_dict[monkey.true_action if new_item % monkey.test == 0 else monkey.false_action]
+                if worry_discount == 1:
+                    next_monkey.items.append(new_item % test_product)
+                else:
+                    next_monkey.items.append(new_item)
             monkey.items = []
+            # print(f"Round {round}", monkeys)
         # print(f"Round {round}", monkeys)
     # print("inspection_counts", inspection_counts)
     return functools.reduce(operator.mul, sorted(inspection_counts, reverse=True)[:2])
 
 
+def part1(rows: List[str]) -> int:
+    return solution(rows, 3, 20)
+
+
 assert part1(example) == 10605, part1(example)
 print(part1(input))
+
+
+def part2(rows: List[str]) -> int:
+    return solution(rows, 1, 10000)
+
+
+# assert part2(example) == 2713310158 # , part2(example)
+print(part2(input))
