@@ -20,3 +20,7 @@ def get_input(day, to_lines=True):
             return f.readlines()
         else:
             return f.read()
+
+
+def assert_equals(expected, actual):
+    assert expected == actual, f"Expected: {expected} but was {actual}"
