@@ -2,8 +2,6 @@ import functools
 import itertools
 import json
 import operator
-from collections import deque
-from typing import Callable, Dict, List, NamedTuple, Tuple
 
 import aoc
 
@@ -38,35 +36,26 @@ def listwrap(maybe_list):
     return maybe_list if isinstance(maybe_list, list) else [maybe_list]
 
 
-def correct_order(left, right, depth=0, true_value=True, false_value=False, same_value=None):
-    # print(" " * depth, "- Compare ", left, "and", right, true_value, false_value, same_value)
+def compare_packets(left, right) -> int:
     for li, ri in itertools.zip_longest(left, right):
         if li is None and ri is not None:
-            # print(" " * depth, "   left side ran out. TRUE")
-            return true_value
+            return -1
         elif li is not None and ri is None:
-            # print(" " * depth, "   right side ran out. FALSE")
-            return false_value
+            return 1
         elif isinstance(li, list) or isinstance(ri, list):
-            result = correct_order(listwrap(li), listwrap(ri), depth + 1, true_value, false_value, same_value)
-            # print(" " * depth, "   inner list correct order? ", result)
-            if result != same_value:
+            result = compare_packets(listwrap(li), listwrap(ri))
+            if result != 0:
                 return result
         else:
-            # print(" " * depth, " - Compare ", li, "vs", ri)
             if li != ri:
-                result = li < ri
-                # print(" " * depth, "   correct order? ", result)
-
-                return true_value if result else false_value
-    # print(" " * depth, "   inner list end of block default of True")
-    return same_value
+                return -1 if li < ri else 1
+    return 0
 
 
 def part1(data: str) -> int:
     pairs = [tuple(map(json.loads, pair_str.splitlines())) for pair_str in data.strip().split("\n\n")]
     # print(pairs)
-    correct_indices = [i for i, (left, right) in enumerate(pairs, 1) if correct_order(left, right)]
+    correct_indices = [i for i, (left, right) in enumerate(pairs, 1) if compare_packets(left, right) < 0]
     # print(correct_indices)
     return sum(correct_indices)
 
@@ -77,14 +66,10 @@ print(part1(input))
 
 def part2(data: str) -> int:
     packets = [json.loads(line) for line in data.strip().splitlines() if line]
-    # dividers
     controls = [[[2]], [[6]]]
     packets.extend(controls)
     # print(packets)
-    def comp_func(left, right):
-        return correct_order(left, right, true_value=-1, false_value=1, same_value=0)
-
-    sorted_packets = sorted(packets, key=functools.cmp_to_key(comp_func))
+    sorted_packets = sorted(packets, key=functools.cmp_to_key(compare_packets))
     # print("sorted:")
     # print(sorted_packets)
     return functools.reduce(
@@ -92,7 +77,7 @@ def part2(data: str) -> int:
         [
             i
             for i, packet in enumerate(sorted_packets, 1)
-            if next((True for c in controls if comp_func(c, packet) == 0), False)
+            if next((True for c in controls if compare_packets(c, packet) == 0), False)
         ],
     )
 
