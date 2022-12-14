@@ -77,7 +77,7 @@ def part2(data: str) -> int:
         [
             i
             for i, packet in enumerate(sorted_packets, 1)
-            if next((True for c in controls if compare_packets(c, packet) == 0), False)
+            if any(c for c in controls if compare_packets(c, packet) == 0)
         ],
     )
 
