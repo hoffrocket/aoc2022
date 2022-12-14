@@ -46,9 +46,8 @@ def compare_packets(left, right) -> int:
             result = compare_packets(listwrap(li), listwrap(ri))
             if result != 0:
                 return result
-        else:
-            if li != ri:
-                return -1 if li < ri else 1
+        elif li != ri:
+            return li - ri
     return 0
 
 
