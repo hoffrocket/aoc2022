@@ -70,8 +70,12 @@ class Sensor(NamedTuple):
             return []
 
     @classmethod
-    def from_points(cls, sx, sy, bx, by) -> "Sensor":
+    def from_points(cls, sx: int, sy: int, bx: int, by: int) -> "Sensor":
         return Sensor(sx, sy, bx, by, man_dist(sx, sy, bx, by))
+
+    @classmethod
+    def from_lines(cls, lines: List[str]) -> List["Sensor"]:
+        return [cls.from_points(*map(int, re.findall("-?\d+", line.strip()))) for line in lines]
 
 
 def ranges_for_row(sensors: List[Sensor], row: int) -> List[range]:
@@ -80,7 +84,7 @@ def ranges_for_row(sensors: List[Sensor], row: int) -> List[range]:
 
 
 def part1(lines: List[str], row: int) -> int:
-    sensors = [Sensor.from_points(*map(int, re.findall("-?\d+", line.strip()))) for line in lines]
+    sensors = Sensor.from_lines(lines)
     # print(f"{sensors=}")
     merged_ranges = ranges_for_row(sensors, row)
     # print(f"{merged_ranges=}")
@@ -92,7 +96,7 @@ print(part1(input, 2000000))
 
 
 def part2(lines: List[str], pmax: int) -> int:
-    sensors = [Sensor.from_points(*map(int, re.findall("-?\d+", line.strip()))) for line in lines]
+    sensors = Sensor.from_lines(lines)
     # print(f"{sensors=}")
     beacon_coords = set((s.bx, s.by) for s in sensors)
     max_row = min(pmax, max(s.sy for s in sensors))
